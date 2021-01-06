@@ -34,7 +34,7 @@ def send_notification():
 def check_inventory():
     if check_item_in_stock(get_page_html()):
         send_notification()
-        print("Item is in stock!")
+        print("Item is in stock! " + secrets.url)
     else:
         print("No Stock Recorded Yet")
 
