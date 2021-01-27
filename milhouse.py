@@ -59,5 +59,8 @@ def check_inventory():
 
 while True:
     print("----------------------------------------------")
-    check_inventory()
-    time.sleep(165)
+    try:
+        check_inventory()
+        time.sleep(165)
+    except:
+        print("An error occured trying to check inventory")
