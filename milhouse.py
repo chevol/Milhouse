@@ -8,22 +8,26 @@ import secrets
 def get_page_html(page_url,site_headers):
     headers = site_headers
     page = requests.get(page_url, headers=headers)
-    print(page.status_code)
+    print("URL Status: " + str(page.status_code))
     return page.content
 
 def check_item_in_stock_amazon(page_html):
     soup = BeautifulSoup(page_html, 'html.parser')
     out_of_stock_divs = soup.findAll("div", {"id": "outOfStock"})
     #print(soup.prettify())
-    print(len(out_of_stock_divs) == 0)
+    print("Div Found: " + str(len(out_of_stock_divs) == 0))
     return len(out_of_stock_divs) == 0
 
 def check_item_in_stock_bestbuy(page_html):
     soup = BeautifulSoup(page_html, 'html.parser')
     out_of_stock_divs = soup.findAll("button", {"class": "btn btn-disabled btn-lg btn-block add-to-cart-button"})
     #print(soup.prettify())
-    print(len(out_of_stock_divs) == 0)
+    print("Div Found: " + str(len(out_of_stock_divs) == 0))
     return len(out_of_stock_divs) == 0
+
+def check_item_in_stock_target(page_html):
+    print("Location in Script: " + str(page_html.decode("utf-8").find('available_to_purchase_date_display')))
+    return int(str(page_html.decode("utf-8").find('available_to_purchase_date_display'))) >= 0
 
 def setup_twilio_client():
     account_sid = secrets.twilio_sid
@@ -50,11 +54,23 @@ def check_inventory():
     print("Checking " + str(len(secrets.bestbuy_urls)) + " BestBuy links...")
     for iteration, url in enumerate(secrets.bestbuy_urls):
         print(str(iteration + 1) + ".) Checking BestBuy link - " + url)
-        if check_item_in_stock_bestbuy(get_page_html(url,random.choice(list(secrets.bestbuy_headers)))):
+        if check_item_in_stock_bestbuy(get_page_html(url,random.choice(list(secrets.universal_headers)))):
             send_notification(url)
             print("Item is in stock at BestBuy! " + url)
         else:
             print("No BestBuy Stock Recorded Yet")
+    print("   ")
+
+    #TARGET STOCK CHECK
+    print("Checking " + str(len(secrets.target_urls)) + " Target links...")
+    for iteration, url in enumerate(secrets.target_urls):
+        print("   ")
+        print(str(iteration + 1) + ".) Checking Target link - " + url)
+        if check_item_in_stock_target(get_page_html(url,random.choice(list(secrets.universal_headers)))):
+            send_notification(url)
+            print("Item is in stock at Target! " + url)
+        else:
+            print("No Target Stock Recorded Yet")
     print("   ")
 
 while True:
