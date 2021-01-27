@@ -14,20 +14,27 @@ def get_page_html(page_url,site_headers):
 def check_item_in_stock_amazon(page_html):
     soup = BeautifulSoup(page_html, 'html.parser')
     out_of_stock_divs = soup.findAll("div", {"id": "outOfStock"})
-    #print(soup.prettify())
     print("Div Found: " + str(len(out_of_stock_divs) == 0))
     return len(out_of_stock_divs) == 0
 
 def check_item_in_stock_bestbuy(page_html):
     soup = BeautifulSoup(page_html, 'html.parser')
     out_of_stock_divs = soup.findAll("button", {"class": "btn btn-disabled btn-lg btn-block add-to-cart-button"})
-    #print(soup.prettify())
     print("Div Found: " + str(len(out_of_stock_divs) == 0))
     return len(out_of_stock_divs) == 0
 
 def check_item_in_stock_target(page_html):
     print("Location in Script: " + str(page_html.decode("utf-8").find('available_to_purchase_date_display')))
     return int(str(page_html.decode("utf-8").find('available_to_purchase_date_display'))) >= 0
+
+def check_item_in_stock_walmart(page_html):
+    print("Location in Script: " + str(page_html.decode("utf-8").find('online":true')))
+    return int(str(page_html.decode("utf-8").find('online":true'))) >= 0
+
+def write_html_to_file(soup):
+    f = open("demofile.txt", "a")
+    f.write(soup.prettify())
+    f.close()
 
 def setup_twilio_client():
     account_sid = secrets.twilio_sid
@@ -53,6 +60,7 @@ def check_inventory():
     #BESTBUY STOCK CHECK
     print("Checking " + str(len(secrets.bestbuy_urls)) + " BestBuy links...")
     for iteration, url in enumerate(secrets.bestbuy_urls):
+        print("   ")
         print(str(iteration + 1) + ".) Checking BestBuy link - " + url)
         if check_item_in_stock_bestbuy(get_page_html(url,random.choice(list(secrets.universal_headers)))):
             send_notification(url)
@@ -72,6 +80,18 @@ def check_inventory():
         else:
             print("No Target Stock Recorded Yet")
     print("   ")
+
+    #WALMART STOCK CHECK
+    print("Checking " + str(len(secrets.walmart_urls)) + " Walmart links...")
+    for iteration, url in enumerate(secrets.walmart_urls):
+        print("    ")
+        print(str(iteration + 1) + ".) Checking Walmart link - " + url)
+        if check_item_in_stock_walmart(get_page_html(url,random.choice(list(secrets.universal_headers)))):
+            #send_notification(url)
+            print("Item is in stock at Walmart! " + url)
+        else:
+            print("No Walmart Stock Recorded Yet")
+    print("    ")
 
 while True:
     print("----------------------------------------------")
