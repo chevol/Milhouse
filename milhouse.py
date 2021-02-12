@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from twilio.rest import Client
 import time
 import secrets
+import walmart
 
 def get_page_html(page_url,site_headers):
     headers = site_headers
@@ -26,10 +27,6 @@ def check_item_in_stock_bestbuy(page_html):
 def check_item_in_stock_target(page_html):
     print("Location in Script: " + str(page_html.decode("utf-8").find('available_to_purchase_date_display')))
     return int(str(page_html.decode("utf-8").find('available_to_purchase_date_display'))) >= 0
-
-def check_item_in_stock_walmart(page_html):
-    print("Location in Script: " + str(page_html.decode("utf-8").find('online":true')))
-    return int(str(page_html.decode("utf-8").find('online":true'))) >= 0
 
 def write_html_to_file(soup):
     f = open("demofile.txt", "a")
@@ -81,22 +78,17 @@ def check_inventory():
             print("No Target Stock Recorded Yet")
     print("   ")
 
-    #WALMART STOCK CHECK
-    print("Checking " + str(len(secrets.walmart_urls)) + " Walmart links...")
-    for iteration, url in enumerate(secrets.walmart_urls):
-        print("    ")
-        print(str(iteration + 1) + ".) Checking Walmart link - " + url)
-        if check_item_in_stock_walmart(get_page_html(url,random.choice(list(secrets.universal_headers)))):
-            #send_notification(url)
-            print("Item is in stock at Walmart! " + url)
-        else:
-            print("No Walmart Stock Recorded Yet")
-    print("    ")
 
-while True:
-    print("----------------------------------------------")
-    try:
-        check_inventory()
-        time.sleep(165)
-    except:
-        print("An error occured trying to check inventory")
+def check_winventory():
+    walmartchecker = walmart.WalmartChecker()
+    walmartchecker.check_inventory()
+
+check_winventory()
+
+# while True:
+#     print("----------------------------------------------")
+#     try:
+#         check_inventory()
+#         time.sleep(165)
+#     except:
+#         print("An error occured trying to check inventory")
