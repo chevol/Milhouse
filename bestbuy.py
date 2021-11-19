@@ -22,8 +22,11 @@ class BestBuyChecker:
             print("    ")
             print(str(iteration + 1) + ".) Checking BestBuy link - " + url)
             if self.check_item_in_stock(self.getpagehtml(url, random.choice(list(secrets.universal_headers)))):
-                twiliohelper = twilio_helper.twilio()
-                twiliohelper.send_notification(url)
+                try:
+                    twiliohelper = twilio_helper.twilio()
+                    twiliohelper.send_notification(url)
+                except Exception as e:
+                    print(e)
                 print("Item is in stock at BestBuy! " + url)
             else:
                 print("No BestBuy Stock Recorded Yet")
