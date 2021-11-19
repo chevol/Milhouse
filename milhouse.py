@@ -3,6 +3,7 @@ import walmart
 import target
 import bestbuy
 import amazon
+import gamestop
 import logging
 
 logging.basicConfig(filename='milhouse.log', format='%(asctime)s - %(message)s', datefmt='%B %d, %Y %I:%M:%S %p')
@@ -11,11 +12,13 @@ def check_inventory():
     walmartchecker = walmart.WalmartChecker()
     targetchecker = target.TargetChecker()
     bestbuychecker = bestbuy.BestBuyChecker()
+    gamestopchecker = gamestop.GameStopChecker()
     #amazonchecker = amazon.AmazonChecker()
 
     walmartchecker.check_inventory()
     targetchecker.check_inventory()
     bestbuychecker.check_inventory()
+    gamestopchecker.check_inventory()
     #amazonchecker.check_inventory()
 
 while True:
